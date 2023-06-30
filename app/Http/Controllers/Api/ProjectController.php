@@ -33,7 +33,7 @@ class ProjectController extends Controller
             return response()->json([
                 'success' => false,
                 'error' => 'Project non trovato'
-            ]);
+            ])->setStatusCode(404);
         }
     }
 }
