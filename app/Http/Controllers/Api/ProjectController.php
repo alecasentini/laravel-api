@@ -10,11 +10,15 @@ use Illuminate\Http\Request;
 class ProjectController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
         $types = Type::all();
-        $projects = Project::with('type', 'technologies')->paginate(6);
 
+        if ($request->has('category_id')) {
+            $projects = Project::with(['type', 'technologies'])->where('category_id', $request->category_id)->paginate(6);
+        } else {
+            $projects = Project::with(['type', 'technologies'])->paginate(6);
+        }
         return response()->json([
             'success' => true,
             'types' => $types,
