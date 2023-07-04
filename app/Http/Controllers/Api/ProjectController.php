@@ -12,16 +12,36 @@ class ProjectController extends Controller
 
     public function index(Request $request)
     {
-        $types = Type::all();
+        // $types = Type::all();
+
+        // if ($request->has('category_id')) {
+        //     $projects = Project::with(['type', 'technologies'])->where('category_id', $request->category_id)->paginate(6);
+        // } else {
+        //     $projects = Project::with(['type', 'technologies'])->paginate(6);
+        // }
+        // return response()->json([
+        //     'success' => true,
+        //     'types' => $types,
+        //     'projects' => $projects
+        // ]);
+
+        $query = Project::with(['type', 'technologies']);
 
         if ($request->has('category_id')) {
-            $projects = Project::with(['type', 'technologies'])->where('category_id', $request->category_id)->paginate(6);
-        } else {
-            $projects = Project::with(['type', 'technologies'])->paginate(6);
+            $query->where('category_id', $request->category_id);
         }
+
+        if ($request->has('technologies_ids')) {
+            $technologyIds = explode(',', $request->technologies_ids);
+            $query->whereHas('technologies', function ($query) use ($technologyIds) {
+                $query->whereIn('id', $technologyIds);
+            });
+        }
+
+        $projects = $query->paginate(6);
+
         return response()->json([
             'success' => true,
-            'types' => $types,
             'projects' => $projects
         ]);
     }
